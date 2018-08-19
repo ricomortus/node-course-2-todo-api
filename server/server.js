@@ -4,7 +4,8 @@ const express    = require('express'),
 
 
 //local import
-const {mongoose} = require('./db/mongoose'),
+const {ObjectID} = require('mongodb'),
+      {mongoose} = require('./db/mongoose'),
       {Todo}     = require('./models/todo'),
       {User}     = require('./models/user');
 
@@ -29,6 +30,24 @@ app.get('/todos', (req, res) => {
   }, (e) => {
     res.status(400).send(e);
   });
+});
+
+//Get /todos/:id
+app.get('/todos/:id', (req, res) => {
+   var id = req.params.id;  
+  //Validate id using isValid
+  if(!ObjectID.isValid(id)){
+    return res.status(404).send();
+  }
+  //findById
+ Todo.findById(id).then((todo) => {
+   if (!todo) {
+     return res.status(404).send();
+   }
+   res.send({todo});
+ }).catch((e) =>{
+   res.status(400).send();
+ });
 });
 
 app.listen(3000, () => {
